@@ -1,14 +1,17 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using HazelDash;
+
 namespace DashboardTest
 {
     [TestClass]
-    public class UnitTest1
+    public class AddTodoTest
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TODO_WhenValid_ReturnSuccess()
         {
+
         }
     }
 }
