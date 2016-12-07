@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
 	std::string uri;
 
 	if (argc >= 3) {
-		uri = "ws://" + std::string(argv[1]) + ":20046";
+		uri = "ws://" + std::string(argv[1]) + ":1099";
 
 		for (int argIndex = 2; argIndex < argc; argIndex++) {
 			command += argv[argIndex];
