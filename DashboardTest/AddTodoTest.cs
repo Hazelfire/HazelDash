@@ -120,6 +120,24 @@ namespace DashboardTest
 
         }
 
+        [TestMethod]
+        public void TODO_NetworkAddTodo_TodoAdded()
+        {
+            DashboardServer server = new DashboardServer();
+            server.start();
+            
+            int originalTodosSize = TODOs.size();
+            string todoElement = "This is a todo";
+
+            TestClient client = new TestClient();
+            client.connect("127.0.0.1");
+            client.send("addtodo " + todoElement);
+
+            Assert.AreEqual(originalTodosSize + 1, TODOs.size());
+            Assert.AreEqual(todoElement, TODOs.last());
+
+        }
+
         [TestCleanup]
         public void Cleanup() {
 
