@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 
 namespace HazelDash
@@ -16,11 +17,12 @@ namespace HazelDash
         public static readonly int TODO_MAX_STRING_SIZE = 200;
 
         private static readonly string TODO_FILENAME = "todos.txt";
+        private static Mutex todoMutex = new Mutex();
 
         static public void add(string TODO)
         {
             assertTodoValid(TODO);
-
+            todoMutex.WaitOne();
             if (!File.Exists(TODO_FILENAME))
             {
                 File.WriteAllText(TODO_FILENAME, TODO);
@@ -28,6 +30,7 @@ namespace HazelDash
             else {
                 File.AppendAllText(TODO_FILENAME, "\n" + TODO);
             }
+            todoMutex.ReleaseMutex();
         }
 
         static private void assertTodoValid(string TODO)
@@ -45,7 +48,11 @@ namespace HazelDash
 
         static public string get(int index)
         {
-            return File.ReadAllLines(TODO_FILENAME)[index];
+            todoMutex.WaitOne();
+            string line = File.ReadAllLines(TODO_FILENAME)[index];
+            todoMutex.ReleaseMutex();
+            return line;
+            
         }
 
         static public string last()
@@ -55,6 +62,7 @@ namespace HazelDash
 
         static public void delete(int index)
         {
+            todoMutex.WaitOne();
             string[] todos = File.ReadAllLines(TODO_FILENAME);
 
             string[] newTodos = new string[todos.Length - 1];
@@ -74,28 +82,35 @@ namespace HazelDash
 
             File.WriteAllLines(TODO_FILENAME, newTodos);
 
-
+            todoMutex.ReleaseMutex();
 
         }
 
         static public int size()
         {
+            todoMutex.WaitOne();
+            int lineCount;
             if (File.Exists(TODO_FILENAME))
             {
-                return File.ReadAllLines(TODO_FILENAME).Count();
+                lineCount = File.ReadAllLines(TODO_FILENAME).Count();
             }
             else
             {
-                return 0;
+                lineCount = 0;
             }
+            todoMutex.ReleaseMutex();
+
+            return lineCount;
         }
 
         static public void clear()
         {
+            todoMutex.WaitOne();
             if (File.Exists(TODO_FILENAME))
             {
                 File.Delete(TODO_FILENAME);
             }
+            todoMutex.ReleaseMutex();
         }
     }
 }

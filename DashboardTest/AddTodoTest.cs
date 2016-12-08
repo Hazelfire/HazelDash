@@ -17,12 +17,6 @@ namespace DashboardTest
             TODOs.clear();
         }
 
-        private void addTodo(string todo)
-        {
-            TODOs.add(todo);
-            mTodosAdded++;
-        }
-
         [TestMethod]
         public void TODO_AddMultipleTodos_TodosAdded()
         {
@@ -32,7 +26,7 @@ namespace DashboardTest
 
             foreach (string todoElement in TODOItems)
             {
-                addTodo(todoElement);
+                TODOs.add(todoElement);
             }
 
             Assert.AreEqual(originalTodoSize + 3, TODOs.size());
@@ -52,7 +46,7 @@ namespace DashboardTest
 
             try
             {
-                addTodo(todoElement);
+                TODOs.add(todoElement);
 
                 // If it completed successfully, test failed.
                 Assert.Fail();
@@ -69,7 +63,7 @@ namespace DashboardTest
             int originalTodoSize = TODOs.size();
             string todoElement = "a";
 
-            addTodo(todoElement);
+            TODOs.add(todoElement);
 
             Assert.AreEqual(originalTodoSize + 1, TODOs.size());
             Assert.AreEqual(todoElement, TODOs.last());
@@ -90,7 +84,7 @@ namespace DashboardTest
 
             try
             {
-                addTodo(todoElement);
+                TODOs.add(todoElement);
 
                 // If it completed successfully, test failed.
                 Assert.Fail();
@@ -113,41 +107,18 @@ namespace DashboardTest
                 todoElement += "a";
             }
 
-            addTodo(todoElement);
+            TODOs.add(todoElement);
 
             Assert.AreEqual(originalTodoSize + 1, TODOs.size());
             Assert.AreEqual(todoElement, TODOs.last());
 
         }
-
-        [TestMethod]
-        public void TODO_NetworkAddTodo_TodoAdded()
-        {
-            DashboardServer server = new DashboardServer();
-            server.start();
-            
-            int originalTodosSize = TODOs.size();
-            string todoElement = "This is a todo";
-
-            TestClient client = new TestClient();
-            client.connect("127.0.0.1");
-            client.send("addtodo " + todoElement);
-
-            Assert.AreEqual(originalTodosSize + 1, TODOs.size());
-            Assert.AreEqual(todoElement, TODOs.last());
-
-        }
+        
 
         [TestCleanup]
         public void Cleanup() {
 
-            int deleteFrom = TODOs.size() - mTodosAdded;
-            for(int i = 0; i < mTodosAdded; i++)
-            {
-                TODOs.delete(deleteFrom);
-            }
-
-            mTodosAdded = 0;
+            TODOs.clear();
         }
     }
 }
