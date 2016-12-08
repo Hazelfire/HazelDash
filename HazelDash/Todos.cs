@@ -66,17 +66,15 @@ namespace HazelDash
             string[] todos = File.ReadAllLines(TODO_FILENAME);
 
             string[] newTodos = new string[todos.Length - 1];
-
-            int todoIndex = 0;
+            
             int newTodoIndex = 0;
-            foreach (string todoElement in todos)
+            for (int todoIndex = 0; todoIndex < todos.Length; todoIndex++)
             {
                 if (todoIndex != index)
                 {
-                    newTodos[newTodoIndex] = todoElement;
+                    newTodos[newTodoIndex] = todos[todoIndex];
                     newTodoIndex++;
                 }
-                todoIndex++;
 
             }
 
