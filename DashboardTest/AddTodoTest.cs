@@ -9,15 +9,13 @@ namespace DashboardTest
     public class AddTodoTest
     {
 
-        private int mTodosAdded = 0;
-
         [TestInitialize]
         public void Initialize()
         {
             TODOs.clear();
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void TODO_AddMultipleTodos_TodosAdded()
         {
             string[] TODOItems = { "This is a new TODO", "This is another Todo", "And another one" };
@@ -39,7 +37,7 @@ namespace DashboardTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void TODO_AddTooShortTodo_ThrowError()
         {
             string todoElement = "";
@@ -57,7 +55,7 @@ namespace DashboardTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void TODO_AddMinimumSizeTodo_TodoAdded()
         {
             int originalTodoSize = TODOs.size();
@@ -70,7 +68,7 @@ namespace DashboardTest
 
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void TODO_AddTooLongTodo_ThrowError()
         {
 
@@ -95,7 +93,7 @@ namespace DashboardTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void TODO_AddMaximumSizeTodo_TodoAdded()
         {
             int originalTodoSize = TODOs.size();

@@ -22,7 +22,7 @@ namespace DashboardTest
             mClient.TODOClear();
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void NETTODO_AddMultipleTodos_TodosAdded()
         {
             string[] TODOItems = { "This is a new TODO", "This is another Todo", "And another one" };
@@ -46,7 +46,7 @@ namespace DashboardTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void NETTODO_AddTooShortTodo_ThrowError()
         {
             string todoElement = "";
@@ -64,7 +64,7 @@ namespace DashboardTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void NETTODO_ConnectInvalidServer_ThrowError()
         {
             try {
@@ -79,7 +79,7 @@ namespace DashboardTest
 
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void NETTODO_AddMinimumSizeTodo_TodoAdded()
         {
             int originalTodoSize = mClient.TODOSize();
@@ -92,7 +92,7 @@ namespace DashboardTest
 
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void NETTODO_AddTooLongTodo_ThrowError()
         {
 
@@ -117,7 +117,7 @@ namespace DashboardTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("Unit")]
         public void NETTODO_AddMaximumSizeTodo_TodoAdded()
         {
             int originalTodoSize = mClient.TODOSize();
