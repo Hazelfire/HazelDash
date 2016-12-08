@@ -19,12 +19,13 @@ namespace HazelDash
 
         public WebsocketClient()
         {
-            mClient = new ClientWebSocket();     
+                
         }
 
         public void connect(string hostname)
         {
             string uri = "ws://" + hostname + ":" + DashboardServer.PORT.ToString();
+            mClient = new ClientWebSocket();
             mClient.ConnectAsync(new Uri(uri), CancellationToken.None).Wait();
         }
 
@@ -38,7 +39,8 @@ namespace HazelDash
 
         public void close()
         {
-            mClient.CloseAsync(WebSocketCloseStatus.Empty, null, CancellationToken.None);
+            mClient.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).Wait();
+            
         }
 
         public string getNextMessage()

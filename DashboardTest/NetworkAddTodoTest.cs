@@ -6,7 +6,7 @@ using HazelDash;
 namespace DashboardTest
 {
     [TestClass]
-    public class NetwordAddTodoTest
+    public class NetworkAddTodoTest
     {
         DashboardClient mClient;
         DashboardServer mServer;
@@ -136,13 +136,24 @@ namespace DashboardTest
 
         }
 
+        [TestMethod, TestCategory("Unit")]
+        public void NETTODO_DisconnectRecconnect_Success()
+        {
+            const string todoElement = "TestTodo";
+            mClient.close();
+            mClient.connect("localhost");
+            mClient.TODOAdd(todoElement);
+
+            Assert.AreEqual(todoElement, mClient.TODOLast());
+
+        }
+
         [TestCleanup]
         public void Cleanup()
         {
             mClient.TODOClear();
             mClient.close();
-            mServer.stop();
-            
+            mServer.stop();           
         }
     }
 }

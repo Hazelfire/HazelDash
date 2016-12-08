@@ -19,7 +19,7 @@ namespace DashboardTest
         public void TODO_AddMultipleTodos_TodosAdded()
         {
             string[] TODOItems = { "This is a new TODO", "This is another Todo", "And another one" };
-            int originalTodoSize = TODOs.size();
+            uint originalTodoSize = TODOs.size();
 
 
             foreach (string todoElement in TODOItems)
@@ -32,7 +32,7 @@ namespace DashboardTest
             // Check if they have been added
             for (int i = 0; i < TODOs.size(); i++)
             {
-                int todoIndex = TODOs.size() - TODOItems.Length + i;
+                uint todoIndex = (uint)( TODOs.size() - TODOItems.Length + i);
                 Assert.AreEqual(TODOItems[i], TODOs.get(todoIndex));
             }
         }
@@ -58,7 +58,7 @@ namespace DashboardTest
         [TestMethod, TestCategory("Unit")]
         public void TODO_AddMinimumSizeTodo_TodoAdded()
         {
-            int originalTodoSize = TODOs.size();
+            uint originalTodoSize = TODOs.size();
             string todoElement = "a";
 
             TODOs.add(todoElement);
@@ -96,7 +96,7 @@ namespace DashboardTest
         [TestMethod, TestCategory("Unit")]
         public void TODO_AddMaximumSizeTodo_TodoAdded()
         {
-            int originalTodoSize = TODOs.size();
+            uint originalTodoSize = TODOs.size();
             string todoElement = "";
 
             // Create maximum size Todo

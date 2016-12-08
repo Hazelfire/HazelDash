@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
@@ -13,11 +14,35 @@ namespace HazelDash
 
     public class WebsocketServer
     {
+
         private Action<ClientHandle> mOpenCallback;
         private Action<ClientHandle, string> mMessageCallback;
         private TcpListener mListener;
         private bool mRunning = true;
+        private Task<TcpClient> mListenClientTask;
 
+        /*
+        Websocket Frame
+            0                   1                   2                   3
+          0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+         +-+-+-+-+-------+-+-------------+-------------------------------+
+         |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+         |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+         |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+         | |1|2|3|       |K|             |                               |
+         +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+         |     Extended payload length continued, if payload len == 127  |
+         + - - - - - - - - - - - - - - - +-------------------------------+
+         |                               |Masking-key, if MASK set to 1  |
+         +-------------------------------+-------------------------------+
+         | Masking-key (continued)       |          Payload Data         |
+         +-------------------------------- - - - - - - - - - - - - - - - +
+         :                     Payload Data continued ...                :
+         + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+         |                     Payload Data continued ...                |
+         +---------------------------------------------------------------+
+
+        */
         public void setOnConnectCallback(Action<ClientHandle> callback)
         {
             mOpenCallback = callback;
@@ -32,29 +57,21 @@ namespace HazelDash
         {
             mListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             mListener.Start();
-
-            TcpClient client = await mListener.AcceptTcpClientAsync();
-
+            
             while (mRunning)
             {
-                connectClient(client);
-                if (mOpenCallback != null)
-                    mOpenCallback(new ClientHandle(client));
+                try {
+                    TcpClient client = await mListener.AcceptTcpClientAsync();
+
+                    connectClient(client);
+                    if (mOpenCallback != null)
+                        mOpenCallback(new ClientHandle(client));
 
 
-                listenToClient(client);
-
-                if (!mRunning) break;
-
-                Task<TcpClient> connectTask = mListener.AcceptTcpClientAsync();
-                connectTask.Wait();
-                client = connectTask.Result;
+                    listenToClient(client);
+                   
+                } catch (ObjectDisposedException) { } // Connection has been closed, do nothing
             }
-        }
-
-        private void run(int port)
-        {
-            
         }
 
         private void listenToClient(TcpClient client)
@@ -65,16 +82,43 @@ namespace HazelDash
                 if (stream.DataAvailable)
                 {
                     byte[] buffer = new byte[client.Available];
-
+                    
                     stream.Read(buffer, 0, client.Available);
 
-                    string message = decrytMessage(buffer);
+                    if (isCloseMessage(buffer))
+                    {
+                        byte[] closeMessage = createCloseMessage(buffer);
+                        stream.Write(closeMessage, 0, closeMessage.Length);
+                        stream.Close();
+                        client.Close();
+                    }
+                    else {
+                        string message = decrytMessage(buffer);
 
-                    if(mMessageCallback != null)
-                        mMessageCallback(new ClientHandle(client), message);
+                        if (mMessageCallback != null)
+                            mMessageCallback(new ClientHandle(client), message);
+                    }
                     
                 }
             }
+        }
+
+        private bool isCloseMessage(byte[] message)
+        {
+            return (message[0] & 15) == 8;
+        }
+
+        public byte[] createCloseMessage(byte[] clientCloseMessage)
+        {
+            byte[] closeMessage = new byte[4];
+            closeMessage[0] = 136;
+            closeMessage[1] = 2;
+
+            closeMessage[2] = (byte)( clientCloseMessage[2] ^ clientCloseMessage[6]);
+            closeMessage[3] = (byte)( clientCloseMessage[3] ^ clientCloseMessage[7]);
+
+            return closeMessage;
+
         }
 
          private static string decrytMessage(byte[] bytes)
@@ -213,6 +257,7 @@ namespace HazelDash
 
             public void close()
             {
+                
                 mClient.Close();
             }
 

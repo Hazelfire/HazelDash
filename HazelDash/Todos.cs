@@ -11,10 +11,12 @@ namespace HazelDash
 {
     public class TODOs
     {
-        public static readonly string TODO_TOO_SHORT_MESSAGE = "Todo is too short, must be at least " + TODO_MIN_STRING_SIZE.ToString() + " characters";
-        public static readonly string TODO_TOO_LONG_MESSAGE = "Todo is too long, cannot be longer than " + TODO_MAX_STRING_SIZE.ToString() + " characters";
         public static readonly int TODO_MIN_STRING_SIZE = 1;
         public static readonly int TODO_MAX_STRING_SIZE = 200;
+        public static readonly string TODO_TOO_SHORT_MESSAGE = "Todo is too short, must be at least " + TODO_MIN_STRING_SIZE.ToString() + " characters";
+        public static readonly string TODO_TOO_LONG_MESSAGE = "Todo is too long, cannot be longer than " + TODO_MAX_STRING_SIZE.ToString() + " characters";
+
+        public static readonly string TODO_INDEX_TOO_LARGE = "Your index is too large, and does not refer to any todo";
 
         private static readonly string TODO_FILENAME = "todos.txt";
         private static Mutex todoMutex = new Mutex();
@@ -46,13 +48,24 @@ namespace HazelDash
             }
         }
 
-        static public string get(int index)
+        static public string get(uint index)
         {
+            assertTodoIndexValid(index);
             todoMutex.WaitOne();
+            string[] todoElements = File.ReadAllLines(TODO_FILENAME);
+
             string line = File.ReadAllLines(TODO_FILENAME)[index];
             todoMutex.ReleaseMutex();
             return line;
             
+        }
+
+        private static void assertTodoIndexValid(uint index)
+        {
+            if(index >= TODOs.size())
+            {
+                throw new ArgumentException(TODO_INDEX_TOO_LARGE);
+            }
         }
 
         static public string last()
@@ -60,11 +73,15 @@ namespace HazelDash
             return get(size() - 1);
         }
 
-        static public void delete(int index)
+        static public void delete(uint index)
         {
+            assertTodoIndexValid(index);
             todoMutex.WaitOne();
-            string[] todos = File.ReadAllLines(TODO_FILENAME);
-
+            string[] todos = new string[0];
+            if (File.Exists(TODO_FILENAME))
+            {
+                todos = File.ReadAllLines(TODO_FILENAME);
+            }
             string[] newTodos = new string[todos.Length - 1];
             
             int newTodoIndex = 0;
@@ -78,19 +95,24 @@ namespace HazelDash
 
             }
 
-            File.WriteAllLines(TODO_FILENAME, newTodos);
-
+            if (newTodos.Length == 0)
+            {
+                File.Delete(TODO_FILENAME);
+            }
+            else {
+                File.WriteAllLines(TODO_FILENAME, newTodos);
+            }
             todoMutex.ReleaseMutex();
 
         }
 
-        static public int size()
+        static public uint size()
         {
             todoMutex.WaitOne();
-            int lineCount;
+            uint lineCount;
             if (File.Exists(TODO_FILENAME))
             {
-                lineCount = File.ReadAllLines(TODO_FILENAME).Count();
+                lineCount = (uint)File.ReadAllLines(TODO_FILENAME).Count();
             }
             else
             {

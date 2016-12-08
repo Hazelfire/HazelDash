@@ -32,7 +32,6 @@ void on_message(client* c, websocketpp::connection_hdl hdl, message_ptr msg) {
 	// Print and close
 	std::cout << msg->get_payload();
 	c->close(hdl, websocketpp::close::status::normal, "done here");
-	c->stop();
 }
 
 int main(int argc, char* argv[]) {
